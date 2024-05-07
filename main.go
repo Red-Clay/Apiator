@@ -111,7 +111,7 @@ func main() {
 
 	n_results := gjson.Get(data, parser+"|#")
 
-	t.AppendHeader(table.Row{"Nombre / Video (" + str_MaxMachines + "/" + n_results.String() + ")", "Plataforma", "Dificultad", "OS", "Certificaciones/ Nº"})
+	t.AppendHeader(table.Row{"Nombre / Video (" + str_MaxMachines + "/" + n_results.String() + ")", "Plataforma", "Dificultad", "OS", "Certificaciones/ Nº","Tecnicas"})
 
 
 
@@ -128,6 +128,7 @@ func main() {
 		youtube_link := gjson.Get(value.Raw, "video")
 		operative_system := gjson.Get(value.Raw, "os")
 		difficulty := gjson.Get(value.Raw, "state")
+		techniques := gjson.Get(value.Raw, "techniques")
 		certs := gjson.Get(value.Raw, "certification")
 		n_certs := strings.Split(certs.Raw, "\\n")
 		if key.Uint() == inputMaxMachines {
@@ -137,7 +138,7 @@ func main() {
 
 		
 		t.AppendRows([]table.Row{
-			{ name.String() + " /\n" + youtube_link.String()  , platform, difficulty, operative_system,  strings.Join(n_certs, ",") + " / " + strconv.FormatUint(uint64(len(n_certs)), 10)},
+			{ name.String() + " /\n" + youtube_link.String()  , platform, difficulty, operative_system,  strings.Join(n_certs, ",") + " / " + strconv.FormatUint(uint64(len(n_certs)), 10), techniques },
 		})
 
 		t.AppendSeparator()
