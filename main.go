@@ -8,6 +8,7 @@ import (
 	"strings"
 	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/tidwall/gjson"
 )
 
@@ -31,6 +32,13 @@ func capitalizeFirstLetter(s string) string {
 		return s
 	}
 	return strings.ToUpper(string(s[0])) + s[1:]
+}
+
+func longSentenceFormat(sentence string) string {
+	if len(sentence) > 6 {
+		return sentence[:6] + "..."
+	}
+	return sentence
 }
 
 
@@ -111,7 +119,7 @@ func main() {
 
 	n_results := gjson.Get(data, parser+"|#")
 
-	t.AppendHeader(table.Row{"Nombre / Video (" + str_MaxMachines + "/" + n_results.String() + ")", "Plataforma", "Dificultad", "OS", "Certificaciones/ Nº","Tecnicas"})
+	t.AppendHeader(table.Row{"Nombre (" + str_MaxMachines + "/" + n_results.String() + ")", "Plataforma", "Dificultad", "OS", "Nº / Certs","Nº / Tecnicas"})
 
 
 
@@ -125,25 +133,110 @@ func main() {
 	result.ForEach(func(key, value gjson.Result) bool {
 		name := gjson.Get(value.Raw, "name")
 		platform := gjson.Get(value.Raw, "platform")
-		youtube_link := gjson.Get(value.Raw, "video")
+		// youtube_link := gjson.Get(value.Raw, "video")
 		operative_system := gjson.Get(value.Raw, "os")
-		difficulty := gjson.Get(value.Raw, "state")
+		difficulty := gjson.Get(value.Raw, "state").String()
 		techniques := gjson.Get(value.Raw, "techniques")
 		certs := gjson.Get(value.Raw, "certification")
 		n_certs := strings.Split(certs.Raw, "\\n")
+		techniques_sentences := strings.Split(techniques.Raw,"\\n")
+		n_techs := strings.Split(certs.Raw, "\\n")
+
 		if key.Uint() == inputMaxMachines {
 			return false // stop iterating
 		}
+    
+		short_techniques := ""
+	// fmt.Printf("%v",techniques_sentences)
+		for i, sentence := range techniques_sentences {
+			short_techniques = short_techniques + longSentenceFormat(sentence)
+			// fmt.Printf("Resultado:%s\n",short_techniques)
+			if i % 4 == 0 && i >= 3 {
+				short_techniques = short_techniques + "\n"
+			}
+		}
 
+	  easy_color   := color.New(color.FgGreen).SprintFunc()
+	  medium_color := color.New(color.FgYellow).SprintFunc()
+	  hard_color   := color.New(color.FgRed).SprintFunc()
+	  insane_color := color.New(color.FgMagenta).SprintFunc()
 
-		
+		switch diff := difficulty; diff{
+			case "Easy":
+		    difficulty = easy_color(difficulty)
+			case "Medium":
+		    difficulty = medium_color(difficulty)
+		  case "Hard":
+		    difficulty = hard_color(difficulty)
+			case "Insane":
+		    difficulty = insane_color(difficulty)
+			default:
+		}
+    formatedCerts := longSentenceFormat(strings.Join(n_certs,",")) 
+		strCountCerts := strconv.FormatUint(uint64(len(n_certs)),10)
+		certsValue := strCountCerts + " / " + formatedCerts 
+
+    formatedTechs := short_techniques
+		strCountTechs := strconv.FormatUint(uint64(len(n_techs)),10)
+		techsValue := strCountTechs + " / " + formatedTechs
+
 		t.AppendRows([]table.Row{
-			{ name.String() + " /\n" + youtube_link.String()  , platform, difficulty, operative_system,  strings.Join(n_certs, ",") + " / " + strconv.FormatUint(uint64(len(n_certs)), 10), techniques },
+			{ name.String() /* + " /\n" + youtube_link.String()  */ , platform, difficulty, operative_system,  certsValue, techsValue},
+
 		})
 
 		t.AppendSeparator()
 		return true // keep iterating
 	})
-	t.SetStyle(table.StyleLight)
+	// t.SetStyle(table.StyleLight)
+
+	  // t.SortBy([]table.SortBy{
+	  //   {Name: "Dificultad", Mode: table.Asc},
+	  //   // {Name: "OS", Mode: table.Asc},
+   //  })
+
+	 t.SetAllowedRowLength(91)
+	    t.SetStyle(table.Style{
+						Name: "myNewStyle",
+				Box: table.BoxStyle{
+				BottomLeft:       "┗",
+				BottomRight:      "┛",
+				BottomSeparator:  "┻",
+				EmptySeparator:   text.RepeatAndTrim(" ", text.RuneWidthWithoutEscSequences("╋")),
+				Left:             "┃",
+				LeftSeparator:    "┣",
+				MiddleHorizontal: "━",
+				MiddleSeparator:  "╋",
+				MiddleVertical:   "┃",
+				PaddingLeft:      " ",
+				PaddingRight:     " ",
+				PageSeparator:    "\n",
+				Right:            "┃",
+				RightSeparator:   "┫",
+				TopLeft:          "┏",
+				TopRight:         "┓",
+				TopSeparator:     "┳",
+				UnfinishedRow:    " ≈",
+        },
+		        Color: table.ColorOptions{
+            Header:          text.Colors{text.BgHiGreen, text.FgBlack,text.Bold},
+            Row:             text.Colors{text.BgHiBlack },
+            RowAlternate:    text.Colors{text.BgHiBlack },
+        },
+        Format: table.FormatOptions{
+            Footer: text.FormatUpper,
+            Header: text.FormatUpper,
+            Row:    text.FormatDefault,
+        },
+        Options: table.Options{
+            DrawBorder:      true,
+            SeparateColumns: true,
+            SeparateFooter:  true,
+            SeparateHeader:  true,
+            SeparateRows:    false,
+        },
+
+    })
+
 	t.Render()
 }
