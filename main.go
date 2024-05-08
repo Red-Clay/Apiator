@@ -195,7 +195,8 @@ func main() {
 	  //   // {Name: "OS", Mode: table.Asc},
    //  })
 
-	 t.SetAllowedRowLength(91)
+	 // t.SetAllowedRowLength(91)
+
 	    t.SetStyle(table.Style{
 						Name: "myNewStyle",
 				Box: table.BoxStyle{
