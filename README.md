@@ -2,7 +2,8 @@
 
 ## Que es?
 
-Este buscador simple de maquinas escrito en Go.Se visualiza una tabla para encontrar las caracteristicas que el usuario indique con flags.
+Este buscador simple de maquinas escrito en Go.
+Se visualiza una tabla para encontrar maquinas con las caracteristicas que el usuario indique con flags.
 
 ## Motivos?
 
@@ -18,11 +19,11 @@ Todas las Maquinas han sido realizadas por el profe S4vitar.
 
 ```bash
 git clone https://github.com/Red-Clay/SMFilter.git
-go build 
+go build tool # Linux
+go build tool.exe #Windows
 
 ```
 
-I
 ## Filtros
 
 - Si se quiere exfiltrar por el nombre del argumento se debe añadir al principio una exclamación "!"
@@ -50,8 +51,8 @@ tool -p HackTheBox -d !Easy -o Linux  -c !OSCP -t Enum
 > 
 > Se puede desactivar la caracteristica en una shell con:
 > ```bash
->$ cat .zshrc, .bashrc .shellrc
->setopt NO_BANG_HIST # (event history) 
+>"setopt NO_BANG_HIST" >> ~/.bashrc  # (event history) 
+>source ~/.bashrc
 >```
 
 
