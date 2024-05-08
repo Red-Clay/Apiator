@@ -55,5 +55,9 @@ tool -p HackTheBox -d !Easy -o Linux  -c !OSCP -t Enum
 >source ~/.bashrc
 >```
 
-
+### Ejemplos Terminal
+#### Linux
+![[images/LinuxGolangTool.png]]
+#### Windows
+![[images/WindowsGolangTool.png]]
 
