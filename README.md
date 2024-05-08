@@ -57,7 +57,15 @@ tool -p HackTheBox -d !Easy -o Linux  -c !OSCP -t Enum
 
 ### Ejemplos Terminal
 #### Linux
-![[images/LinuxGolangTool.png]]
+
+<p align="center">
+  <img src="images/LinuxGolangTool.png" alt="LinuxTable"><br>
+</p>
+
 #### Windows
-![[images/WindowsGolangTool.png]]
+
+<p align="center">
+  <img src="images/WindowsGolangTool.png" alt="WindowsTable"><br>
+</p>
+
 
