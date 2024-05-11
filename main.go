@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
 	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
@@ -41,14 +42,13 @@ func longSentenceFormat(sentence string) string {
 	return sentence
 }
 
-
 func Init() (inputMaxMachines uint64, inputOS string, inputPlatform string, inputDifficulty string, inputCertification string, inputName string, inputTechs string) {
 	var help bool
 
 	// Yet not pointers
 	flag.Uint64Var(&inputMaxMachines, "max", 10, "Maximum number of machines to display.")
-	flag.StringVar(&inputName, "n", "-1" , "Search machine by name.")
-	flag.StringVar(&inputTechs, "t", "-1" , "Search machine by techniques.")
+	flag.StringVar(&inputName, "n", "-1", "Search machine by name.")
+	flag.StringVar(&inputTechs, "t", "-1", "Search machine by techniques.")
 	flag.StringVar(&inputDifficulty, "d", "-1", "Search machines by difficulty.")
 	flag.StringVar(&inputOS, "o", "-1", "Search machines by operating system.")
 	flag.StringVar(&inputCertification, "c", "-1", "Search machines by certifications.")
@@ -63,126 +63,135 @@ func Init() (inputMaxMachines uint64, inputOS string, inputPlatform string, inpu
 		os.Exit(0)
 	}
 
+	// if strings.EqualFold("htb",inputPlatform) || strings.EqualFold("hackthebox",inputPlatform){
+	// inputPlatform = "HackTheBox"
+	// }
 
-  // if strings.EqualFold("htb",inputPlatform) || strings.EqualFold("hackthebox",inputPlatform){
-		// inputPlatform = "HackTheBox"
-  // }
-
-  return
+	return
 }
 
 func main() {
-
-
-  // caser := cases.Title(language.English)
+	// caser := cases.Title(language.English)
 
 	// ARGUMENTS
-	inputMaxMachines, inputOS, inputPlatform, inputDifficulty, inputCertification,inputName,inputTechs := Init()
+	inputMaxMachines, inputOS, inputPlatform, inputDifficulty, inputCertification, inputName, inputTechs := Init()
 
-	str_MaxMachines := strconv.FormatUint(uint64(inputMaxMachines), 10)
+	tableHeaderMaxMachines := strconv.FormatUint(uint64(inputMaxMachines), 10)
 
 	mappedFields := map[string]string{
-		"platform" : inputPlatform,
-		"name" : capitalizeFirstLetter(inputName),
-		"techniques" : inputTechs,
-		"certification" :inputCertification,
-		"video" : "-1",
-		"ip" : "-1",
-		"os" : capitalizeFirstLetter(inputOS),
-		"state" : capitalizeFirstLetter(inputDifficulty),
+		"platform":      inputPlatform,
+		"name":          capitalizeFirstLetter(inputName),
+		"techniques":    inputTechs,
+		"certification": inputCertification,
+		"video":         "-1",
+		"ip":            "-1",
+		"os":            capitalizeFirstLetter(inputOS),
+		"state":         capitalizeFirstLetter(inputDifficulty),
 	}
 
-
-	parser:= "newData"
+	parser := "newData"
 
 	for k, v := range mappedFields {
 		if v == "-1" {
 			continue
 		}
 		if string(v[0]) == "!" {
-			parser = fmt.Sprintf("%s|#(%s!%%*%s*)#",parser,k,string(v[1:])) 
+			parser = fmt.Sprintf("%s|#(%s!%%*%s*)#", parser, k, string(v[1:]))
 			continue
 		}
 
-		 parser = fmt.Sprintf("%s|#(%s%%*%s*)#",parser,k,v) 
+		parser = fmt.Sprintf("%s|#(%s%%*%s*)#", parser, k, v)
 
-  }
+	}
 
 	dat, err := os.ReadFile("./machines.json")
 	check(err)
 	data := string(dat)
 
-	// TABLE 
+	// TABLE
 	t := table.NewWriter()
 
 	t.SetOutputMirror(os.Stdout)
 
 	n_results := gjson.Get(data, parser+"|#")
 
-	t.AppendHeader(table.Row{"Nombre (" + str_MaxMachines + "/" + n_results.String() + ")", "Plataforma", "Dificultad", "OS", "Nº / Certs","Nº / Tecnicas"})
+	t.AppendHeader(
+		table.Row{
+			"Nombre (" + tableHeaderMaxMachines + "/" + n_results.String() + ")",
+			"Plataforma",
+			"Dificultad",
+			"OS",
+			"Nº / Certs",
+			"Nº / Tecnicas",
+		},
+	)
 
-
-
-// https://github.com/tidwall/gjson/issues/64
+	// https://github.com/tidwall/gjson/issues/64
 	// result := gjson.Get(data, "newData.#(platform==HackTheBox)#|#(certification%*eWPT*)#|#(certification%*eWPTXv2*)#|#(certification!%*OSWE*)#")
 	// fmt.Printf("\nGJSON: %v\n",gjson.Get(data, parser+"|#"))
 
 	result := gjson.Get(data, parser)
-  // fmt.Printf("%v\n",result)
+	// fmt.Printf("%v\n",result)
 
 	result.ForEach(func(key, value gjson.Result) bool {
 		name := gjson.Get(value.Raw, "name")
 		platform := gjson.Get(value.Raw, "platform")
 		// youtube_link := gjson.Get(value.Raw, "video")
 		operative_system := gjson.Get(value.Raw, "os")
-		difficulty := gjson.Get(value.Raw, "state").String()
+		filterDifficultyArg := gjson.Get(value.Raw, "state").String()
 		techniques := gjson.Get(value.Raw, "techniques")
 		certs := gjson.Get(value.Raw, "certification")
 		n_certs := strings.Split(certs.Raw, "\\n")
-		techniques_sentences := strings.Split(techniques.Raw,"\\n")
+		techniques_sentences := strings.Split(techniques.Raw, "\\n")
 		n_techs := strings.Split(certs.Raw, "\\n")
 
 		if key.Uint() == inputMaxMachines {
 			return false // stop iterating
 		}
-    
+
 		short_techniques := ""
-	// fmt.Printf("%v",techniques_sentences)
+		// fmt.Printf("%v",techniques_sentences)
 		for i, sentence := range techniques_sentences {
 			short_techniques = short_techniques + longSentenceFormat(sentence)
 			// fmt.Printf("Resultado:%s\n",short_techniques)
-			if i % 4 == 0 && i >= 3 {
+			if i%4 == 0 && i >= 3 {
 				short_techniques = short_techniques + "\n"
 			}
 		}
 
-	  easy_color   := color.New(color.FgGreen).SprintFunc()
-	  medium_color := color.New(color.FgYellow).SprintFunc()
-	  hard_color   := color.New(color.FgRed).SprintFunc()
-	  insane_color := color.New(color.FgMagenta).SprintFunc()
+		easy_color := color.New(color.FgGreen).SprintFunc()
+		medium_color := color.New(color.FgYellow).SprintFunc()
+		hard_color := color.New(color.FgRed).SprintFunc()
+		insane_color := color.New(color.FgMagenta).SprintFunc()
 
-		switch diff := difficulty; diff{
-			case "Easy":
-		    difficulty = easy_color(difficulty)
-			case "Medium":
-		    difficulty = medium_color(difficulty)
-		  case "Hard":
-		    difficulty = hard_color(difficulty)
-			case "Insane":
-		    difficulty = insane_color(difficulty)
-			default:
+		switch diff := filterDifficultyArg; diff {
+		case "Easy":
+			filterDifficultyArg = easy_color(filterDifficultyArg)
+		case "Medium":
+			filterDifficultyArg = medium_color(filterDifficultyArg)
+		case "Hard":
+			filterDifficultyArg = hard_color(filterDifficultyArg)
+		case "Insane":
+			filterDifficultyArg = insane_color(filterDifficultyArg)
+		default:
 		}
-    formatedCerts := longSentenceFormat(strings.Join(n_certs,",")) 
-		strCountCerts := strconv.FormatUint(uint64(len(n_certs)),10)
-		certsValue := strCountCerts + " / " + formatedCerts 
+		formatedCerts := longSentenceFormat(strings.Join(n_certs, ","))
+		strCountCerts := strconv.FormatUint(uint64(len(n_certs)), 10)
+		certsValue := strCountCerts + " / " + formatedCerts
 
-    formatedTechs := short_techniques
-		strCountTechs := strconv.FormatUint(uint64(len(n_techs)),10)
+		formatedTechs := short_techniques
+		strCountTechs := strconv.FormatUint(uint64(len(n_techs)), 10)
 		techsValue := strCountTechs + " / " + formatedTechs
 
 		t.AppendRows([]table.Row{
-			{ name.String() /* + " /\n" + youtube_link.String()  */ , platform, difficulty, operative_system,  certsValue, techsValue},
-
+			{
+				name.String(), /* + " /\n" + youtube_link.String()  */
+				platform,
+				filterDifficultyArg,
+				operative_system,
+				certsValue,
+				techsValue,
+			},
 		})
 
 		t.AppendSeparator()
@@ -190,54 +199,53 @@ func main() {
 	})
 	// t.SetStyle(table.StyleLight)
 
-	  // t.SortBy([]table.SortBy{
-	  //   {Name: "Dificultad", Mode: table.Asc},
-	  //   // {Name: "OS", Mode: table.Asc},
-   //  })
+	// t.SortBy([]table.SortBy{
+	//   {Name: "Dificultad", Mode: table.Asc},
+	//   // {Name: "OS", Mode: table.Asc},
+	//  })
 
-	 // t.SetAllowedRowLength(91)
+	// t.SetAllowedRowLength(91)
 
-	    t.SetStyle(table.Style{
-						Name: "myNewStyle",
-				Box: table.BoxStyle{
-				BottomLeft:       "┗",
-				BottomRight:      "┛",
-				BottomSeparator:  "┻",
-				EmptySeparator:   text.RepeatAndTrim(" ", text.RuneWidthWithoutEscSequences("╋")),
-				Left:             "┃",
-				LeftSeparator:    "┣",
-				MiddleHorizontal: "━",
-				MiddleSeparator:  "╋",
-				MiddleVertical:   "┃",
-				PaddingLeft:      " ",
-				PaddingRight:     " ",
-				PageSeparator:    "\n",
-				Right:            "┃",
-				RightSeparator:   "┫",
-				TopLeft:          "┏",
-				TopRight:         "┓",
-				TopSeparator:     "┳",
-				UnfinishedRow:    " ≈",
-        },
-		        Color: table.ColorOptions{
-            Header:          text.Colors{text.BgHiGreen, text.FgBlack,text.Bold},
-            Row:             text.Colors{text.BgHiBlack },
-            RowAlternate:    text.Colors{text.BgHiBlack },
-        },
-        Format: table.FormatOptions{
-            Footer: text.FormatUpper,
-            Header: text.FormatUpper,
-            Row:    text.FormatDefault,
-        },
-        Options: table.Options{
-            DrawBorder:      true,
-            SeparateColumns: true,
-            SeparateFooter:  true,
-            SeparateHeader:  true,
-            SeparateRows:    false,
-        },
-
-    })
+	t.SetStyle(table.Style{
+		Name: "myNewStyle",
+		Box: table.BoxStyle{
+			BottomLeft:       "┗",
+			BottomRight:      "┛",
+			BottomSeparator:  "┻",
+			EmptySeparator:   text.RepeatAndTrim(" ", text.RuneWidthWithoutEscSequences("╋")),
+			Left:             "┃",
+			LeftSeparator:    "┣",
+			MiddleHorizontal: "━",
+			MiddleSeparator:  "╋",
+			MiddleVertical:   "┃",
+			PaddingLeft:      " ",
+			PaddingRight:     " ",
+			PageSeparator:    "\n",
+			Right:            "┃",
+			RightSeparator:   "┫",
+			TopLeft:          "┏",
+			TopRight:         "┓",
+			TopSeparator:     "┳",
+			UnfinishedRow:    " ≈",
+		},
+		Color: table.ColorOptions{
+			Header:       text.Colors{text.BgHiGreen, text.FgBlack, text.Bold},
+			Row:          text.Colors{text.BgHiBlack},
+			RowAlternate: text.Colors{text.BgHiBlack},
+		},
+		Format: table.FormatOptions{
+			Footer: text.FormatUpper,
+			Header: text.FormatUpper,
+			Row:    text.FormatDefault,
+		},
+		Options: table.Options{
+			DrawBorder:      true,
+			SeparateColumns: true,
+			SeparateFooter:  true,
+			SeparateHeader:  true,
+			SeparateRows:    false,
+		},
+	})
 
 	t.Render()
 }

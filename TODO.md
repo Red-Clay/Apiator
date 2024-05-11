@@ -8,8 +8,10 @@ Limitaciones de go y json
 - no se puede buscar por insensitive case (no ignora mayuscula ni minusculas)
 - no se pueden eliminar columnas (Cambio de codigo muy necesario)
 
+- Arreglar el cortado de la tabla dependiendo de la ventana del usuario
+
 # Tareas Go 
-- 1 Debugger?
+- ~1 Debugger?~
 - 2 Estructuras?
 - 3 Metodos?
 - 4 Organización?
