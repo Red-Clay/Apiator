@@ -1,18 +1,19 @@
 # Tareas Tabla
-Utilizar una nueva flag para no formatear cadenas largas
+- Flag permite el cambiar el formato de los valore de la tabla
+- Flag que devuelve solo los nombres y links del writeup
 
-Utilizar otro parametro por el cual poder recoger un input el cual sera el index de la maquina escogida , esto devolvera la URL respectiva a la maquina.
-
-Limitaciones de go y json
-- ~~no se pueden ordenar las filas~~
-- no se puede buscar por insensitive case (no ignora mayuscula ni minusculas)
+## Limitaciones de go y json
+- ~~Ordenamiento de filas~~
+- Sin Ordenamiento de filas (Posible:Convertir lowercase el archivo)
 - no se pueden eliminar columnas (Cambio de codigo muy necesario)
 
 - Arreglar el cortado de la tabla dependiendo de la ventana del usuario
 
 # Tareas Go 
 - ~1 Debugger?~
+ - neovim plugin : https://github.com/ray-x/go.nvim
 - 2 Estructuras?
+ - 
 - 3 Metodos?
 - 4 Organización?
 - 5 Punteros?

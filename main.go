@@ -6,28 +6,21 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
 	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/tidwall/gjson"
 )
 
+// check function    
 func check(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
 
-// func stringInSlice(a string, list []string) bool {
-//     for _, b := range list {
-//         if b == a {
-//             return true
-//         }
-//     }
-//     return false
-// }
 
+
+// capitalizeFirstLetter function    
 func capitalizeFirstLetter(s string) string {
 	if len(s) == 0 {
 		return s
@@ -35,6 +28,11 @@ func capitalizeFirstLetter(s string) string {
 	return strings.ToUpper(string(s[0])) + s[1:]
 }
 
+
+
+
+
+// longSentenceFormat function    
 func longSentenceFormat(sentence string) string {
 	if len(sentence) > 6 {
 		return sentence[:6] + "..."
@@ -42,10 +40,10 @@ func longSentenceFormat(sentence string) string {
 	return sentence
 }
 
+// Init function    
 func Init() (inputMaxMachines uint64, inputOS string, inputPlatform string, inputDifficulty string, inputCertification string, inputName string, inputTechs string) {
 	var help bool
 
-	// Yet not pointers
 	flag.Uint64Var(&inputMaxMachines, "max", 10, "Maximum number of machines to display.")
 	flag.StringVar(&inputName, "n", "-1", "Search machine by name.")
 	flag.StringVar(&inputTechs, "t", "-1", "Search machine by techniques.")
@@ -206,46 +204,7 @@ func main() {
 
 	// t.SetAllowedRowLength(91)
 
-	t.SetStyle(table.Style{
-		Name: "myNewStyle",
-		Box: table.BoxStyle{
-			BottomLeft:       "┗",
-			BottomRight:      "┛",
-			BottomSeparator:  "┻",
-			EmptySeparator:   text.RepeatAndTrim(" ", text.RuneWidthWithoutEscSequences("╋")),
-			Left:             "┃",
-			LeftSeparator:    "┣",
-			MiddleHorizontal: "━",
-			MiddleSeparator:  "╋",
-			MiddleVertical:   "┃",
-			PaddingLeft:      " ",
-			PaddingRight:     " ",
-			PageSeparator:    "\n",
-			Right:            "┃",
-			RightSeparator:   "┫",
-			TopLeft:          "┏",
-			TopRight:         "┓",
-			TopSeparator:     "┳",
-			UnfinishedRow:    " ≈",
-		},
-		Color: table.ColorOptions{
-			Header:       text.Colors{text.BgHiGreen, text.FgBlack, text.Bold},
-			Row:          text.Colors{text.BgHiBlack},
-			RowAlternate: text.Colors{text.BgHiBlack},
-		},
-		Format: table.FormatOptions{
-			Footer: text.FormatUpper,
-			Header: text.FormatUpper,
-			Row:    text.FormatDefault,
-		},
-		Options: table.Options{
-			DrawBorder:      true,
-			SeparateColumns: true,
-			SeparateFooter:  true,
-			SeparateHeader:  true,
-			SeparateRows:    false,
-		},
-	})
+	t.SetStyle(PersonalizedStyle)
 
 	t.Render()
 }
