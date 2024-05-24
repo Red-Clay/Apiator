@@ -11,14 +11,12 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// check function    
+// check function  
 func check(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
-
-
 
 // capitalizeFirstLetter function    
 func capitalizeFirstLetter(s string) string {
@@ -27,10 +25,6 @@ func capitalizeFirstLetter(s string) string {
 	}
 	return strings.ToUpper(string(s[0])) + s[1:]
 }
-
-
-
-
 
 // longSentenceFormat function    
 func longSentenceFormat(sentence string) string {
@@ -41,16 +35,17 @@ func longSentenceFormat(sentence string) string {
 }
 
 // Init function    
-func Init() (inputMaxMachines uint64, inputOS string, inputPlatform string, inputDifficulty string, inputCertification string, inputName string, inputTechs string) {
+func Init() (inputMaxMachines uint64, inputOS string, inputPlatform string, inputDifficulty string, inputCertification string, inputName string, inputTechs string,inputLink string) {
 	var help bool
 
 	flag.Uint64Var(&inputMaxMachines, "max", 10, "Maximum number of machines to display.")
 	flag.StringVar(&inputName, "n", "-1", "Search machine by name.")
-	flag.StringVar(&inputTechs, "t", "-1", "Search machine by techniques.")
+	flag.StringVar(&inputTechs, "t", "-1", "Search machine by technique.")
 	flag.StringVar(&inputDifficulty, "d", "-1", "Search machines by difficulty.")
 	flag.StringVar(&inputOS, "o", "-1", "Search machines by operating system.")
-	flag.StringVar(&inputCertification, "c", "-1", "Search machines by certifications.")
+	flag.StringVar(&inputCertification, "c", "-1", "Search machines by certification.")
 	flag.StringVar(&inputPlatform, "p", "-1", "Search by platform.")
+	flag.StringVar(&inputLink, "l", "-1", "Get Link from machine name.") // ESTO
 	flag.BoolVar(&help, "help", false, "Display information about usage.")
 
 	flag.Parse()
@@ -72,7 +67,7 @@ func main() {
 	// caser := cases.Title(language.English)
 
 	// ARGUMENTS
-	inputMaxMachines, inputOS, inputPlatform, inputDifficulty, inputCertification, inputName, inputTechs := Init()
+	inputMaxMachines, inputOS, inputPlatform, inputDifficulty, inputCertification, inputName, inputTechs, inputLink := Init()
 
 	tableHeaderMaxMachines := strconv.FormatUint(uint64(inputMaxMachines), 10)
 
@@ -105,7 +100,13 @@ func main() {
 	dat, err := os.ReadFile("./machines.json")
 	check(err)
 	data := string(dat)
-
+  if inputLink != "-1" {
+		link_parser := fmt.Sprintf("newData.#(name==%s).video", inputLink)
+		youtube_link := gjson.Get(data, link_parser)
+		fmt.Printf("\nMachine : %s\nYoutube : %s\n",inputLink ,youtube_link.String())
+		os.Exit(0)
+  } 
+  
 	// TABLE
 	t := table.NewWriter()
 
