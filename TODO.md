@@ -10,10 +10,10 @@
 - Arreglar el cortado de la tabla dependiendo de la ventana del usuario
 
 # Tareas Go 
+- Prueba
 - ~1 Debugger?~
  - neovim plugin : https://github.com/ray-x/go.nvim
 - 2 Estructuras?
- - 
 - 3 Metodos?
 - 4 Organización?
 - 5 Punteros?
